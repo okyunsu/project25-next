@@ -1,8 +1,8 @@
 "use client";
 
-import ImageSection from './components/ImageSection';
-import SignupForm from './components/SignupForm';
-import { useSignup } from './hooks/useSignup';
+import ImageSection from '../../../../components/(account)/guest/customer/new/ImageSection';
+import SignupForm from '../../../../components/(account)/guest/customer/new/SignupForm';
+import { useSignup } from '../../../../hooks/(account)/guest/new/useSignup';
 
 /**
  * 회원가입 페이지 컴포넌트
