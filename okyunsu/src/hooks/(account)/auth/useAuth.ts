@@ -1,80 +1,60 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
-import api from '@/lib/axios';
+import { useState } from "react";
+import api from '@/lib/axios'
+import { useUserStore } from "@/store/account/auth/user/store";
 
-// 로그인 폼 데이터
-interface LoginForm {
-    id: string;
-    password: string;
+interface LoginFormState {
+  user_id: string;
+  password: string;
 }
 
-// 로그인 요청 데이터
-interface LoginRequest {
-    user_id: string;
-    password: string;
+export function useAuth() {
+  const [form, setForm] = useState<LoginFormState>({
+    user_id: "",
+    password: "",
+  });
+
+  const [error, setError] = useState<string>("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!form.user_id || !form.password) {
+      setError("아이디와 비밀번호를 입력하세요.");
+      return false;
+    }
+
+    setError("");
+    
+    try {
+      console.log("로그인 시도:", {
+        url: `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+        data: form
+      });
+
+      const response = await api.post('/api/auth/login', {
+        user_id: form.user_id,
+        password: form.password
+      });
+      
+      console.log("로그인 성공:", response.data);   
+      const token = response.data.accessToken;
+      // useAuthStore.getState().setAccessToken(token);
+      return true;
+    } catch (err: any) {
+      console.log("로그인 실패");
+      console.log("에러 메시지:", err.message);
+      console.log("에러 응답 데이터:", err.response?.data);
+      console.log("에러 상태 코드:", err.response?.status);
+      
+      const serverErrorMessage = err.response?.data?.detail || "로그인 실패. 다시 시도해주세요.";
+      setError(serverErrorMessage);
+      return false;
+    }
+  };
+
+  return { form, error, handleChange, handleSubmit };
 }
-
-// 로그인 응답 데이터
-interface LoginResponse {
-    success: boolean;
-    message?: string;
-}
-
-// 훅 반환 타입
-interface UseAuthReturn {
-    form: LoginForm;
-    error: string | null;
-    handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
-    handleSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
-}
-
-// API 엔드포인트
-const API_ENDPOINTS = {
-    LOGIN: '/auth/login'
-};
-
-// 초기 폼 상태
-const initialForm: LoginForm = {
-    id: '',
-    password: ''
-};
-
-export function useAuth(): UseAuthReturn {
-    const [form, setForm] = useState<LoginForm>(initialForm);
-    const [error, setError] = useState<string | null>(null);
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setError(null);
-
-        try {
-            const response = await api.post<LoginResponse>(
-                API_ENDPOINTS.LOGIN,
-                { user_id: form.id, password: form.password }
-            );
-
-            if (!response.data.success) {
-                setError(response.data.message || '로그인에 실패했습니다.');
-                setForm(prev => ({ ...prev, password: '' }));
-            }
-        } catch (err) {
-            console.error('로그인 실패:', err);
-            setError('로그인 처리 중 오류가 발생했습니다.');
-            setForm(prev => ({ ...prev, password: '' }));
-        }
-    };
-
-    return {
-        form,
-        error,
-        handleChange,
-        handleSubmit
-    };
-} 

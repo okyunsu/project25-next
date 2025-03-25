@@ -1,22 +1,18 @@
-// src/lib/axios.ts
 import axios from 'axios'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 const api = axios.create({
-  baseURL: `${BASE_URL}/api`,
-  headers: {
-    'Content-Type': 'application/json',
-  }
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 })
 
 api.interceptors.request.use((config) => {
-  const userData = localStorage.getItem('user_data')
-  if (userData) {
-    const { user_id } = JSON.parse(userData)
-    config.headers.Authorization = `Bearer ${user_id}`
-  }
+  // const token = useAuthStore.getState().accessToken
+  // if (token) {
+  //   config.headers.Authorization = `Bearer ${token}`
+  // }
+  config.headers.Authorization = `Bearer blah blah blah`
   return config
 })
 
 export default api
+  
