@@ -2,11 +2,16 @@ import { memo } from 'react';
 import Link from 'next/link';
 import FormField from './FormField';
 import ErrorMessage from './ErrorMessage';
-import { useSignup } from '@/hooks/(account)/guest/new/useSignup';
+import { SignupFormData } from '@/hooks/(account)/guest/new/useSignup';
 
-function SignupForm() {
-  const { form, errorMsg, handleChange, handleSubmit } = useSignup();
+interface SignupFormProps {
+  form: SignupFormData;
+  errorMsg: string;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+}
 
+function SignupForm({ form, errorMsg, handleChange, handleSubmit }: SignupFormProps) {
   return (
     <div className="flex-1 bg-teal-600 p-8 text-white overflow-y-auto max-h-screen">
       <h2 className="text-3xl font-bold text-center mb-6">회원가입</h2>
@@ -53,7 +58,7 @@ function SignupForm() {
             name="confirmPassword"
             label="비밀번호 확인"
             type="password"
-            placeholder="비밀번호 재입력"
+            placeholder="비밀번호를 다시 입력하세요"
             value={form.confirmPassword}
             onChange={handleChange}
             maxLength={15}
@@ -64,27 +69,26 @@ function SignupForm() {
             name="name"
             label="이름"
             type="text"
-            placeholder="2~10자 한글 또는 영문"
+            placeholder="실명을 입력하세요"
             value={form.name}
             onChange={handleChange}
-            maxLength={10}
+            maxLength={20}
           />
           
-          <div className="mt-8">
-            <button
-              type="submit"
-              className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold hover:bg-teal-400 cursor-pointer transition-colors"
-            >
-              회원가입 완료
-            </button>
-            <Link
-              href="/auth/login"
-              className="w-full block border border-white mt-3 py-3 rounded-lg font-semibold text-center hover:bg-white hover:text-teal-600 cursor-pointer transition-colors"
-            >
-              로그인 페이지로 돌아가기
-            </Link>
-          </div>
+          <button
+            type="submit"
+            className="w-full bg-white text-teal-600 py-2 px-4 rounded-lg font-semibold hover:bg-teal-50 transition-colors"
+          >
+            가입하기
+          </button>
         </form>
+        
+        <p className="text-center text-sm">
+          이미 계정이 있으신가요?{' '}
+          <Link href="/login" className="underline hover:text-teal-200">
+            로그인
+          </Link>
+        </p>
       </div>
     </div>
   );
