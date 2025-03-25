@@ -1,6 +1,6 @@
 import { useState } from "react";
 import api from '@/lib/axios'
-import { useUserStore } from "@/store/account/auth/user/store";
+// import { useUserStore } from "@/store/account/auth/user/store";
 
 interface LoginFormState {
   user_id: string;
@@ -41,7 +41,7 @@ export function useAuth() {
       });
       
       console.log("로그인 성공:", response.data);   
-      const token = response.data.accessToken;
+      // const token = response.data.accessToken;
       // useAuthStore.getState().setAccessToken(token);
       return true;
     } catch (err: any) {
