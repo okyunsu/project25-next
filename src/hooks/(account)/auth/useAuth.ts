@@ -7,6 +7,14 @@ interface LoginFormState {
   password: string;
 }
 
+interface LoginResponse {
+  message: string;
+  name: string | null;
+  success: boolean;
+  token: string | null;
+  user_id: string | null;
+}
+
 export function useAuth() {
   const [form, setForm] = useState<LoginFormState>({
     user_id: "",
@@ -35,11 +43,26 @@ export function useAuth() {
         data: form
       });
 
-      const response = await api.post('/api/auth/login', {
+      const response = await api.post<LoginResponse>('/api/auth/login', {
         user_id: form.user_id,
         password: form.password
       });
       
+      console.log("로그인 응답:", response.data);
+
+      // 응답 데이터 확인
+      if (!response.data) {
+        setError("서버 응답이 없습니다.");
+        return false;
+      }
+
+      // success 값으로 로그인 성공 여부 판단
+      if (!response.data.success) {
+        setError(response.data.message || "로그인에 실패했습니다.");
+        return false;
+      }
+
+      // 로그인 성공
       console.log("로그인 성공:", response.data);   
       // const token = response.data.accessToken;
       // useAuthStore.getState().setAccessToken(token);
