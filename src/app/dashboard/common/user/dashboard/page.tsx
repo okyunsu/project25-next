@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { DeleteUserButton } from '@/components/(account)/guest/delete/DeleteUserButton';
 
 interface Customer {
   user_id: string;
@@ -66,7 +65,7 @@ export default function UserPage() {
                 <td className="border border-gray-800 px-4 py-2">{customer.email}</td>
                 <td className="border border-gray-800 px-4 py-2">
                   <div className="flex justify-center">
-                    <DeleteUserButton userId={customer.user_id} />
+                    {/* 작업 버튼은 나중에 추가 예정 */}
                   </div>
                 </td>
               </tr>
