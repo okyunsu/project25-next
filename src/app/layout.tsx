@@ -1,8 +1,8 @@
-import { ThemeProvider } from '../components/ThemeProvider';
+import { ThemeProvider } from 'next-themes';
 import type { Metadata } from 'next';
 import { Space_Grotesk } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
-import { Header } from '../components/Header';
+import Header from '@/components/Header';
 import './globals.css';
 
 const space_grotesk = Space_Grotesk({

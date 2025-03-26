@@ -5,9 +5,8 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 export type UserType = {
   user_id: string;
-  email: string;
   name: string;
-  password: string;
+  setUser: (user: { user_id: string; name: string }) => void;
   reset: () => void;
 }
 
@@ -15,14 +14,14 @@ export const useUserStore = create<UserType>()(
   persist(
     (set) => ({
       user_id: '',
-      email: '',
       name: '',
-      password: '',
+      setUser: (user) => set({
+        user_id: user.user_id,
+        name: user.name,
+      }),
       reset: () => set({
         user_id: '',
-        email: '',
         name: '',
-        password: '',
       }),
     }),
     {

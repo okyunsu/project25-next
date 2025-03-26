@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from '@/lib/axios'
-// import { useUserStore } from "@/store/account/auth/user/store";
+import { useUserStore } from "@/store/account/auth/user/store";
+import { useRouter } from "next/navigation";
 
 interface LoginFormState {
   user_id: string;
@@ -9,10 +10,10 @@ interface LoginFormState {
 
 interface LoginResponse {
   message: string;
-  name: string | null;
   success: boolean;
-  token: string | null;
-  user_id: string | null;
+  token: string;
+  user_id: string;
+  name: string;
 }
 
 export function useAuth() {
@@ -22,6 +23,7 @@ export function useAuth() {
   });
 
   const [error, setError] = useState<string>("");
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,53 +33,56 @@ export function useAuth() {
     e.preventDefault();
 
     if (!form.user_id || !form.password) {
-      setError("아이디와 비밀번호를 입력하세요.");
+      setError("로그인 데이터가 필요합니다.");
       return false;
     }
 
     setError("");
     
     try {
-      console.log("로그인 시도:", {
-        url: `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-        data: form
-      });
-
       const response = await api.post<LoginResponse>('/api/auth/login', {
         user_id: form.user_id,
         password: form.password
       });
-      
-      console.log("로그인 응답:", response.data);
 
       // 응답 데이터 확인
       if (!response.data) {
-        setError("서버 응답이 없습니다.");
+        setError("시스템 오류가 발생했습니다.");
         return false;
       }
 
       // success 값으로 로그인 성공 여부 판단
       if (!response.data.success) {
-        setError(response.data.message || "로그인에 실패했습니다.");
+        setError(response.data.message);
         return false;
       }
 
-      // 로그인 성공
-      console.log("로그인 성공:", response.data);   
-      // const token = response.data.accessToken;
-      // useAuthStore.getState().setAccessToken(token);
+      // zustand 저장
+      if (response.data.user_id && response.data.name) {
+        const store = useUserStore.getState();
+        store.setUser({
+          user_id: response.data.user_id,
+          name: response.data.name
+        });
+        
+        // 로그인 성공 후 메인 페이지로 리다이렉트
+        router.push('/');
+      }
+
       return true;
     } catch (err: any) {
-      console.log("로그인 실패");
-      console.log("에러 메시지:", err.message);
-      console.log("에러 응답 데이터:", err.response?.data);
-      console.log("에러 상태 코드:", err.response?.status);
-      
-      const serverErrorMessage = err.response?.data?.detail || "로그인 실패. 다시 시도해주세요.";
+      const serverErrorMessage = err.response?.data?.message || "시스템 오류가 발생했습니다.";
       setError(serverErrorMessage);
       return false;
     }
   };
 
-  return { form, error, handleChange, handleSubmit };
+  const handleLogout = () => {
+    // zustand store 초기화
+    useUserStore.getState().reset();
+    // 로그인 페이지로 리다이렉트
+    router.push('/login');
+  };
+
+  return { form, error, handleChange, handleSubmit, handleLogout };
 }
