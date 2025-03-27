@@ -8,10 +8,7 @@ export default function LoginForm() {
   const { form, error, handleChange, handleSubmit } = useAuth();
 
   const onSubmit = async (e: React.FormEvent) => {
-    const success = await handleSubmit(e);
-    if (success) {
-      router.push("/dashboard/common/user/dashboard");
-    }
+    await handleSubmit(e);
   };
 
   return (

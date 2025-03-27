@@ -67,6 +67,7 @@ export function useAuth() {
         
         // 로그인 성공 후 메인 페이지로 리다이렉트
         router.push('/');
+        router.refresh(); // 페이지 새로고침을 강제로 실행
       }
 
       return true;
