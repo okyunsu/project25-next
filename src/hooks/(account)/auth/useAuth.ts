@@ -11,7 +11,7 @@ interface LoginFormState {
 interface LoginResponse {
   message: string;
   success: boolean;
-  token: string;
+  access_token: string;
   user_id: string;
   name: string;
 }
@@ -65,6 +65,21 @@ export function useAuth() {
           name: response.data.name
         });
         
+        console.log('=== 로그인 성공 ===');
+        console.log('전체 응답 데이터:', JSON.stringify(response.data, null, 2));
+        console.log('사용자 정보:', {
+          user_id: response.data.user_id,
+          name: response.data.name
+        });
+        
+        // 토큰 저장
+        if (response.data.access_token) {
+          localStorage.setItem('access_token', response.data.access_token);
+          console.log('토큰 저장됨:', response.data.access_token);
+        } else {
+          console.log('토큰이 응답에 없습니다. 응답 데이터:', JSON.stringify(response.data, null, 2));
+        }
+        
         // 로그인 성공 후 메인 페이지로 리다이렉트
         router.push('/');
         router.refresh(); // 페이지 새로고침을 강제로 실행
@@ -81,6 +96,8 @@ export function useAuth() {
   const handleLogout = () => {
     // zustand store 초기화
     useUserStore.getState().reset();
+    // localStorage에서 토큰 제거
+    localStorage.removeItem('access_token');
     // 로그인 페이지로 리다이렉트
     router.push('/login');
   };
